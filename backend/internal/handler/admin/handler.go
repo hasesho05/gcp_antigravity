@@ -27,7 +27,7 @@ func (h *AdminHandler) UploadQuestions(w http.ResponseWriter, r *http.Request) {
 	
 	var req input.UploadQuestionsRequest
 	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
-		http.Error(w, "Invalid request body", http.StatusBadRequest)
+		http.Error(w, "リクエストボディが無効です", http.StatusBadRequest)
 		return
 	}
 
@@ -43,7 +43,7 @@ func (h *AdminHandler) UploadQuestions(w http.ResponseWriter, r *http.Request) {
 		}
 		// Log the full error with stack trace for internal errors
 		// log.Printf("%+v", err) 
-		http.Error(w, "Internal Server Error", http.StatusInternalServerError)
+		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
 		return
 	}
 

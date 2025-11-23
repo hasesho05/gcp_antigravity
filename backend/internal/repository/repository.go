@@ -12,4 +12,5 @@ type ExamRepository interface {
 	SaveAttempt(ctx context.Context, attempt domain.Attempt) error
 	GetAttempt(ctx context.Context, attemptID string, userID string) (*domain.Attempt, error)
 	UpdateStats(ctx context.Context, stats domain.UserExamStats) error
+	GetUserExamStats(ctx context.Context, userID, examID string) (*domain.UserExamStats, error)
 }
