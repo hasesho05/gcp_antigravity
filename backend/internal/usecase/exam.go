@@ -3,6 +3,7 @@ package usecase
 import (
 	"context"
 	"fmt"
+	"math"
 	"time"
 
 	"github.com/cockroachdb/errors"
@@ -204,12 +205,8 @@ func (u *examUsecase) CompleteAttempt(ctx context.Context, userID, attemptID str
 		}
 
 		stats.TotalAttempts++
-		attemptPercentage := 0.0
-		if attempt.TotalQuestions > 0 {
-			attemptPercentage = float64(attempt.Score) / float64(attempt.TotalQuestions) * 100
-		}
-		currentTotalAvg := stats.AverageScore * float64(stats.TotalAttempts-1)
-		stats.AverageScore = (currentTotalAvg + attemptPercentage) / float64(stats.TotalAttempts)
+		stats.TotalScore += score
+		stats.TotalQuestionsAnswered += attempt.TotalQuestions
 		stats.LastTakenAt = now
 
 		for dName, total := range domainTotal {
@@ -221,7 +218,7 @@ func (u *examUsecase) CompleteAttempt(ctx context.Context, userID, attemptID str
 			dScore.TotalCount += total
 			dScore.CorrectCount += correct
 			if dScore.TotalCount > 0 {
-				dScore.AccuracyRate = int(float64(dScore.CorrectCount) / float64(dScore.TotalCount) * 100)
+				dScore.AccuracyRate = int(math.Round(float64(dScore.CorrectCount) / float64(dScore.TotalCount) * 100))
 			}
 			stats.DomainStats[dName] = dScore
 		}

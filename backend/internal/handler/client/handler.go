@@ -2,6 +2,7 @@ package client
 
 import (
 	"encoding/json"
+	"fmt"
 	"net/http"
 
 	"github.com/cockroachdb/errors"
@@ -38,7 +39,14 @@ func (h *ClientHandler) GetQuestions(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, "問題が見つかりませんでした", http.StatusNotFound)
 			return
 		}
+		fmt.Printf("internal server error: %+v\n", err)
 		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
+		return
+	}
+
+	// ルートのexamIDと取得した問題のexamIDが一致するか検証
+	if len(questions) > 0 && questions[0].ExamID != examID {
+		http.Error(w, "URLのexamIDと問題のexamIDが一致しません", http.StatusBadRequest)
 		return
 	}
 
@@ -65,6 +73,7 @@ func (h *ClientHandler) StartAttempt(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
 			return
 		}
+		fmt.Printf("internal server error: %+v\n", err)
 		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
 		return
 	}
@@ -93,6 +102,7 @@ func (h *ClientHandler) UpdateAttempt(w http.ResponseWriter, r *http.Request) {
 			http.Error(w, err.Error(), http.StatusConflict)
 			return
 		}
+		fmt.Printf("internal server error: %+v\n", err)
 		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
 		return
 	}
@@ -122,6 +132,7 @@ func (h *ClientHandler) CompleteAttempt(w http.ResponseWriter, r *http.Request) 
 			http.Error(w, err.Error(), http.StatusConflict)
 			return
 		}
+		fmt.Printf("internal server error: %+v\n", err)
 		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
 		return
 	}
@@ -140,6 +151,7 @@ func (h *ClientHandler) GetStats(w http.ResponseWriter, r *http.Request) {
 
 	stats, err := h.usecase.GetUserExamStats(r.Context(), userID, examID)
 	if err != nil {
+		fmt.Printf("internal server error: %+v\n", err)
 		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
 		return
 	}

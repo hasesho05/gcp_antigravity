@@ -42,7 +42,7 @@ func (h *AdminHandler) UploadQuestions(w http.ResponseWriter, r *http.Request) {
 			return
 		}
 		// Log the full error with stack trace for internal errors
-		// log.Printf("%+v", err) 
+		fmt.Printf("internal server error: %+v\n", err)
 		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
 		return
 	}

@@ -4,6 +4,8 @@
 
 # Environment variables
 .env
+*.orig
+
 
 # Mac
 .DS_Store
@@ -11,3 +13,5 @@
 # Editor
 .idea
 .vscode
+
+.gemini/settings.json
