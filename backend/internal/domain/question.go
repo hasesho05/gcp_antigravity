@@ -25,3 +25,31 @@ type AnswerOption struct {
 	Text        string `json:"answer" firestore:"text"`             // 選択肢の文言
 	Explanation string `json:"explanation" firestore:"explanation"` // この選択肢ごとの解説
 }
+
+// NewQuestion は新しいQuestionドメインオブジェクトを生成します。
+func NewQuestion(
+	id, examID, examSetID, examCode, qText, qType, overallExplanation, domainName, imageURL string,
+	options []AnswerOption,
+	correctAnswers, referenceURLs []string,
+	now time.Time,
+) (*Question, error) {
+	if id == "" || examID == "" || examSetID == "" || qText == "" {
+		return nil, errors.New("質問のID, ExamID, ExamSetID, QuestionTextは必須です")
+	}
+
+	return &Question{
+		ID:                 id,
+		ExamID:             examID,
+		ExamSetID:          examSetID,
+		ExamCode:           examCode,
+		QuestionText:       qText,
+		QuestionType:       qType,
+		Options:            options,
+		CorrectAnswers:     correctAnswers,
+		OverallExplanation: overallExplanation,
+		Domain:             domainName,
+		ImageURL:           imageURL,
+		ReferenceURLs:      referenceURLs,
+		CreatedAt:          now,
+	}, nil
+}

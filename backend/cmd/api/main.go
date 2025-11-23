@@ -39,14 +39,14 @@ func run() error {
 
 	// Firebase Authの初期化
 	authClient, err := auth.NewClient(ctx)
-	if err != nil {
-		// エラーをログに出力しますが、バックエンドAPIにとって認証は必須のためpanicさせても良いかもしれません
-		panic(err)
+	panic(err)
 	}
 
 	// 依存性の注入 (Dependency Injection)
-	examRepo := repository_impl.NewExamRepository(client)
-	examUsecase := usecase.NewExamUsecase(examRepo)
+	qRepo := repository_impl.NewQuestionRepository(client)
+	aRepo := repository_impl.NewAttemptRepository(client)
+	sRepo := repository_impl.NewUserStatsRepository(client)
+	examUsecase := usecase.NewExamUsecase(qRepo, aRepo, sRepo)
 	adminHandler := admin.NewAdminHandler(examUsecase)
 	clientHandler := client_handler.NewClientHandler(examUsecase)
 

@@ -97,8 +97,9 @@ func (h *ClientHandler) UpdateAttempt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
-	w.Write([]byte(`{"status":"updated"}`))
+	json.NewEncoder(w).Encode(map[string]string{"status": "updated"})
 }
 
 func (h *ClientHandler) CompleteAttempt(w http.ResponseWriter, r *http.Request) {
@@ -144,12 +145,12 @@ func (h *ClientHandler) GetStats(w http.ResponseWriter, r *http.Request) {
 	}
 
 	if stats == nil {
-		// 空の統計情報を返すか、404を返すか？
-		// フロントエンドは未受験の場合に空のオブジェクトを期待するかもしれません。
-		// 現状は404または空の構造体を返します。
-		// 設計では "GET /users/me/stats/{examID}" となっています。
-		http.Error(w, "成績データが見つかりませんでした", http.StatusNotFound)
-		return
+		// 統計情報が存在しない場合は、空のオブジェクトを返す
+		stats = &domain.UserExamStats{
+			ExamID:      examID,
+			UserID:      userID,
+			DomainStats: make(map[string]domain.DomainScore),
+		}
 	}
 
 	w.Header().Set("Content-Type", "application/json")

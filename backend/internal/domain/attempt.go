@@ -15,7 +15,30 @@ type Attempt struct {
 	Answers        map[string][]string `json:"answers" firestore:"answers"` // Key: QuestionID, Value: Selected Option IDs
 	StartedAt      time.Time           `json:"startedAt" firestore:"started_at"`
 	UpdatedAt      time.Time           `json:"updatedAt" firestore:"updated_at"`
-	CompletedAt    *time.Time          `json:"completedAt,omitempty" firestore:"completed_at,omitempty"`
+	CompletedAt    *time.Time          `firestore:"completed_at,omitempty"`
+	StartedAt      time.Time           `firestore:"started_at"`
+	UpdatedAt      time.Time           `firestore:"updated_at"`
+}
+
+// NewAttempt は新しいAttemptドメインオブジェクトを生成します。
+func NewAttempt(id, userID, examID, examSetID string, totalQuestions int, now time.Time) (*Attempt, error) {
+	if id == "" || userID == "" || examID == "" || examSetID == "" {
+		return nil, errors.New("AttemptのID, UserID, ExamID, ExamSetIDは必須です")
+	}
+
+	return &Attempt{
+		ID:             id,
+		UserID:         userID,
+		ExamID:         examID,
+		ExamSetID:      examSetID,
+		Status:         StatusInProgress,
+		Score:          0,
+		TotalQuestions: totalQuestions,
+		CurrentIndex:   0,
+		Answers:        make(map[string][]string),
+		StartedAt:      now,
+		UpdatedAt:      now,
+	}, nil
 }
 
 // AttemptStatus は受験の進捗状態を定義します。

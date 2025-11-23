@@ -9,7 +9,19 @@ type UserExamStats struct {
 	TotalAttempts int                    `json:"totalAttempts" firestore:"total_attempts"`
 	AverageScore  float64                `json:"averageScore" firestore:"average_score"`
 	DomainStats   map[string]DomainScore `json:"domainStats" firestore:"domain_stats"` // 分野ごとの集計
-	LastTakenAt   time.Time              `json:"lastTakenAt" firestore:"last_taken_at"`
+	LastTakenAt   time.Time              `firestore:"last_taken_at"`
+}
+
+// NewUserExamStats は新しいUserExamStatsドメインオブジェクトを生成します。
+func NewUserExamStats(userID, examID string) (*UserExamStats, error) {
+	if userID == "" || examID == "" {
+		return nil, errors.New("統計情報のUserIDとExamIDは必須です")
+	}
+	return &UserExamStats{
+		UserID:      userID,
+		ExamID:      examID,
+		DomainStats: make(map[string]DomainScore),
+	}, nil
 }
 
 // DomainScore は特定分野ごとの成績集計です。
