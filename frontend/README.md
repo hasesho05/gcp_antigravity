@@ -19,12 +19,12 @@
 ### Prerequisites
 
 - Node.js 18+
-- npm or yarn
+- pnpm 8+
 
 ### Installation
 
 ```bash
-npm install
+pnpm install
 ```
 
 ### Environment Setup
@@ -42,7 +42,7 @@ cp .env.example .env
 #### 開発
 
 ```bash
-npm run dev
+pnpm dev
 ```
 
 開発サーバーを起動します。デフォルトで `http://localhost:5173` で起動します。
@@ -50,7 +50,7 @@ npm run dev
 #### ビルド
 
 ```bash
-npm run build
+pnpm build
 ```
 
 本番用ビルドを作成します。
@@ -58,7 +58,7 @@ npm run build
 #### プレビュー
 
 ```bash
-npm run preview
+pnpm preview
 ```
 
 ビルドされたアプリケーションをローカルでプレビューします。
@@ -66,29 +66,29 @@ npm run preview
 #### テスト
 
 ```bash
-npm run test          # テストを実行
-npm run test:ui       # Vitest UIでテストを実行
+pnpm test          # テストを実行
+pnpm test:ui       # Vitest UIでテストを実行
 ```
 
 #### Linting & Formatting
 
 ```bash
-npm run lint          # コードをチェック
-npm run lint:fix      # 自動修正可能な問題を修正
-npm run format        # コードをフォーマット
+pnpm lint          # コードをチェック
+pnpm lint:fix      # 自動修正可能な問題を修正
+pnpm format        # コードをフォーマット
 ```
 
 #### Storybook
 
 ```bash
-npm run storybook           # Storybookを起動
-npm run build-storybook     # Storybookをビルド
+pnpm storybook           # Storybookを起動
+pnpm build-storybook     # Storybookをビルド
 ```
 
 #### API型生成
 
 ```bash
-npm run gen:types
+pnpm gen:types
 ```
 
 バックエンドのJSON定義からTypeScript型を生成します。
@@ -146,7 +146,7 @@ src/
 バックエンドの型定義が更新された場合:
 
 1. Backend: `make generate-sample`
-2. Frontend: `npm run gen:types`
+2. Frontend: `pnpm gen:types`
 
 ## Documentation
 
