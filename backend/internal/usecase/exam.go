@@ -27,17 +27,20 @@ type examUsecase struct {
 	qRepo    repository.QuestionRepository
 	aRepo    repository.AttemptRepository
 	sRepo    repository.UserStatsRepository
+	txRepo   repository.TransactionRepository
 }
 
 func NewExamUsecase(
 	qRepo repository.QuestionRepository,
 	aRepo repository.AttemptRepository,
 	sRepo repository.UserStatsRepository,
+	txRepo repository.TransactionRepository,
 ) ExamUsecase {
 	return &examUsecase{
 		qRepo:    qRepo,
 		aRepo:    aRepo,
 		sRepo:    sRepo,
+		txRepo:   txRepo,
 	}
 }
 
@@ -150,8 +153,8 @@ func (u *examUsecase) UpdateAttempt(ctx context.Context, userID, attemptID strin
 func (u *examUsecase) CompleteAttempt(ctx context.Context, userID, attemptID string, req input.CompleteAttemptRequest) (*domain.Attempt, error) {
 	var completedAttempt *domain.Attempt
 
-	err := u.sRepo.RunTransaction(ctx, func(ctx context.Context) error {
-		attempt, err := u.aRepo.Find(ctx, attemptID, userID)
+	err := u.txRepo.Run(ctx, func(txCtx context.Context) error {
+		attempt, err := u.aRepo.Find(txCtx, attemptID, userID)
 		if err != nil {
 			return err
 		}
@@ -160,7 +163,7 @@ func (u *examUsecase) CompleteAttempt(ctx context.Context, userID, attemptID str
 			return errors.Wrap(domain.ErrFailedPrecondition, "試験は既に完了しています")
 		}
 
-		questions, err := u.qRepo.FindByExamSetID(ctx, attempt.ExamSetID)
+		questions, err := u.qRepo.FindByExamSetID(txCtx, attempt.ExamSetID)
 		if err != nil {
 			return err
 		}
@@ -193,7 +196,7 @@ func (u *examUsecase) CompleteAttempt(ctx context.Context, userID, attemptID str
 		attempt.CompletedAt = &now
 		attempt.UpdatedAt = now
 
-		stats, err := u.sRepo.Find(ctx, userID, attempt.ExamID)
+		stats, err := u.sRepo.Find(txCtx, userID, attempt.ExamID)
 		if err != nil {
 			return err
 		}
@@ -223,10 +226,10 @@ func (u *examUsecase) CompleteAttempt(ctx context.Context, userID, attemptID str
 			stats.DomainStats[dName] = dScore
 		}
 
-		if err := u.aRepo.Save(ctx, *attempt); err != nil {
+		if err := u.aRepo.Save(txCtx, *attempt); err != nil {
 			return err
 		}
-		if err := u.sRepo.Save(ctx, *stats); err != nil {
+		if err := u.sRepo.Save(txCtx, *stats); err != nil {
 			return err
 		}
 

@@ -26,6 +26,11 @@ func (r *userStatsRepository) Save(ctx context.Context, stats domain.UserExamSta
 	}
 
 	docRef := r.client.Collection("users").Doc(stats.UserID).Collection("stats").Doc(stats.ExamID)
+	
+	if tx, ok := GetTransaction(ctx); ok {
+		return tx.Set(docRef, stats)
+	}
+
 	_, err := docRef.Set(ctx, stats)
 	if err != nil {
 		return errors.Wrap(err, "firestore: statsの保存に失敗しました")
@@ -52,10 +57,4 @@ func (r *userStatsRepository) Find(ctx context.Context, userID, examID string) (
 	}
 
 	return &stats, nil
-}
-
-func (r *userStatsRepository) RunTransaction(ctx context.Context, f func(ctx context.Context) error) error {
-    return r.client.RunTransaction(ctx, func(ctx context.Context, tx *firestore.Transaction) error {
-        return f(ctx)
-    })
 }

@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/cockroachdb/errors"
+)
 
 // UserExamStats は「資格ごと(ExamID)」の累積成績です。
 type UserExamStats struct {
@@ -16,7 +20,7 @@ type UserExamStats struct {
 // NewUserExamStats は新しいUserExamStatsドメインオブジェクトを生成します。
 func NewUserExamStats(userID, examID string) (*UserExamStats, error) {
 	if userID == "" || examID == "" {
-		return nil, errors.New("統計情報のUserIDとExamIDは必須です")
+		return nil, errors.Wrap(ErrInvalidArgument, "統計情報のUserIDとExamIDは必須です")
 	}
 	return &UserExamStats{
 		UserID:      userID,

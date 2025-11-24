@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/cockroachdb/errors"
+)
 
 // Attempt はユーザーの1回の受験データを表します。
 type Attempt struct {
@@ -16,8 +20,6 @@ type Attempt struct {
 	StartedAt      time.Time           `json:"startedAt" firestore:"started_at"`
 	UpdatedAt      time.Time           `json:"updatedAt" firestore:"updated_at"`
 	CompletedAt    *time.Time          `firestore:"completed_at,omitempty"`
-	StartedAt      time.Time           `firestore:"started_at"`
-	UpdatedAt      time.Time           `firestore:"updated_at"`
 }
 
 // NewAttempt は新しいAttemptドメインオブジェクトを生成します。
@@ -49,3 +51,4 @@ const (
 	StatusPaused     AttemptStatus = "paused"      // 中断中
 	StatusCompleted  AttemptStatus = "completed"   // 完了
 )
+

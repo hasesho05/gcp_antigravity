@@ -26,6 +26,11 @@ func (r *attemptRepository) Save(ctx context.Context, attempt domain.Attempt) er
 	}
 
 	docRef := r.client.Collection("users").Doc(attempt.UserID).Collection("attempts").Doc(attempt.ID)
+	
+	if tx, ok := GetTransaction(ctx); ok {
+		return tx.Set(docRef, attempt)
+	}
+
 	_, err := docRef.Set(ctx, attempt)
 	if err != nil {
 		return errors.Wrap(err, "firestore: attemptの保存に失敗しました")

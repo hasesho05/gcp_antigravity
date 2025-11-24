@@ -22,5 +22,9 @@ type AttemptRepository interface {
 type UserStatsRepository interface {
 	Save(ctx context.Context, stats domain.UserExamStats) error
 	Find(ctx context.Context, userID, examID string) (*domain.UserExamStats, error)
-	RunTransaction(ctx context.Context, f func(ctx context.Context) error) error
+}
+
+// TransactionRepositoryはトランザクション操作を管理します。
+type TransactionRepository interface {
+	Run(ctx context.Context, f func(txCtx context.Context) error) error
 }

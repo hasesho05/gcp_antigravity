@@ -10,6 +10,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cockroachdb/errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
@@ -39,14 +40,16 @@ func run() error {
 
 	// Firebase Authの初期化
 	authClient, err := auth.NewClient(ctx)
-	panic(err)
+	if err != nil {
+		return errors.Wrap(err, "Firebase Authクライアントの初期化に失敗しました")
 	}
 
 	// 依存性の注入 (Dependency Injection)
 	qRepo := repository_impl.NewQuestionRepository(client)
 	aRepo := repository_impl.NewAttemptRepository(client)
 	sRepo := repository_impl.NewUserStatsRepository(client)
-	examUsecase := usecase.NewExamUsecase(qRepo, aRepo, sRepo)
+	txRepo := repository_impl.NewTransactionRepository(client) // 追加
+	examUsecase := usecase.NewExamUsecase(qRepo, aRepo, sRepo, txRepo) // txRepoを追加
 	adminHandler := admin.NewAdminHandler(examUsecase)
 	clientHandler := client_handler.NewClientHandler(examUsecase)
 
@@ -78,7 +81,7 @@ func run() error {
 	// クライアント用ルート
 	r.Group(func(r chi.Router) {
 		r.Use(authMiddleware)
-		
+
 		// Exams
 		r.Route("/exams/{examID}", func(r chi.Router) {
 			r.Get("/sets/{examSetID}/questions", clientHandler.GetQuestions)
@@ -119,6 +122,7 @@ func run() error {
 	}
 
 	log.Println("Server exiting")
+	return nil
 }
 
 func corsMiddleware(next http.Handler) http.Handler {
@@ -137,3 +141,4 @@ func corsMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+

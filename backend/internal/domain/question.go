@@ -1,6 +1,10 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/cockroachdb/errors"
+)
 
 // Question は1つの問題を表すマスターデータです。
 type Question struct {
@@ -34,7 +38,7 @@ func NewQuestion(
 	now time.Time,
 ) (*Question, error) {
 	if id == "" || examID == "" || examSetID == "" || qText == "" {
-		return nil, errors.New("質問のID, ExamID, ExamSetID, QuestionTextは必須です")
+		return nil, errors.Wrap(ErrInvalidArgument, "質問のID, ExamID, ExamSetID, QuestionTextは必須です")
 	}
 
 	return &Question{

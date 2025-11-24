@@ -53,10 +53,11 @@ func main() {
 	}
 
 	stats := domain.UserExamStats{
-		ExamID:        "professional_cloud_developer",
-		UserID:        "user123",
-		TotalAttempts: 1,
-		AverageScore:  85.5,
+		ExamID:                 "professional_cloud_developer",
+		UserID:                 "user123",
+		TotalAttempts:          1,
+		TotalScore:             85,
+		TotalQuestionsAnswered: 100,
 		DomainStats: map[string]domain.DomainScore{
 			"Compute": {DomainName: "Compute", CorrectCount: 8, TotalCount: 10, AccuracyRate: 80},
 		},
