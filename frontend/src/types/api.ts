@@ -37,7 +37,7 @@ export interface Attempt {
   userId: string;
   examId: string;
   examSetId: string;
-  status: 'in_progress' | 'completed';
+  status: 'in_progress' | 'paused' | 'completed';
   score: number;
   totalQuestions: number;
   currentIndex: number;
