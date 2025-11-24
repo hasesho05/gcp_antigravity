@@ -1,0 +1,65 @@
+{
+  "User": {
+    "id": "user123",
+    "email": "test@example.com",
+    "role": "admin",
+    "subscriptionStatus": "active",
+    "createdAt": "2023-01-01T00:00:00Z"
+  },
+  "Question": {
+    "id": "PCD_SET1_001",
+    "examId": "professional_cloud_developer",
+    "examSetId": "practice_exam_1",
+    "examCode": "PCD",
+    "question": "<p>What is Cloud Run?</p>",
+    "questionType": "multiple-choice",
+    "answerOptions": [
+      {
+        "id": "a",
+        "answer": "Serverless container platform",
+        "explanation": "Correct. Cloud Run is a fully managed serverless platform."
+      },
+      {
+        "id": "b",
+        "answer": "Virtual Machine service",
+        "explanation": "Incorrect. This describes Compute Engine."
+      }
+    ],
+    "correctAnswers": ["a"],
+    "overallExplanation": "<p>Cloud Run is a managed serverless platform that enables you to run containers directly on top of Google's scalable infrastructure.</p>",
+    "domain": "Compute",
+    "createdAt": "2023-01-01T00:00:00Z"
+  },
+  "Attempt": {
+    "id": "attempt123",
+    "userId": "user123",
+    "examId": "professional_cloud_developer",
+    "examSetId": "practice_exam_1",
+    "status": "in_progress",
+    "score": 0,
+    "totalQuestions": 50,
+    "currentIndex": 5,
+    "answers": {
+      "PCD_SET1_001": ["a"]
+    },
+    "startedAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2023-01-01T00:00:00Z",
+    "completedAt": null
+  },
+  "UserExamStats": {
+    "examId": "professional_cloud_developer",
+    "userId": "user123",
+    "totalAttempts": 1,
+    "totalScore": 85,
+    "totalQuestionsAnswered": 100,
+    "domainStats": {
+      "Compute": {
+        "domainName": "Compute",
+        "correctCount": 8,
+        "totalCount": 10,
+        "accuracyRate": 80
+      }
+    },
+    "lastTakenAt": "2023-01-01T00:00:00Z"
+  }
+}
