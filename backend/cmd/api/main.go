@@ -10,49 +10,97 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/cockroachdb/errors"
+	"github.com/go-chi/chi/v5"
+	"github.com/go-chi/chi/v5/middleware"
+
 	"gcp_antigravity/backend/internal/handler/admin"
 	client_handler "gcp_antigravity/backend/internal/handler/client"
+	"gcp_antigravity/backend/internal/infra/auth"
 	"gcp_antigravity/backend/internal/infra/firestore"
+	internal_middleware "gcp_antigravity/backend/internal/middleware"
 	"gcp_antigravity/backend/internal/repository_impl"
 	"gcp_antigravity/backend/internal/usecase"
 )
 
 func main() {
-	ctx := context.Background()
+	// サーバーの起動
+	if err := run(); err != nil {
+		log.Fatalf("サーバーの起動に失敗しました: %v", err)
+	}
+}
 
-	// Initialize Firestore
+func run() error {
+	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
+	defer stop()
+
+	// Firestoreの初期化
 	client := firestore.NewClient(ctx)
 	defer client.Close()
 
-	// Dependency Injection
-	examRepo := repository_impl.NewExamRepository(client)
-	examUsecase := usecase.NewExamUsecase(examRepo)
-	adminHandler := admin.NewAdminHandler(examUsecase)
-	clientHandler := client_handler.NewClientHandler(examUsecase)
+	// Firebase Authの初期化
+	authClient, err := auth.NewClient(ctx)
+	if err != nil {
+		return errors.Wrap(err, "Firebase Authクライアントの初期化に失敗しました")
+	}
+
+	// 依存性の注入 (Dependency Injection)
+	qRepo := repository_impl.NewQuestionRepository(client)
+	aRepo := repository_impl.NewAttemptRepository(client)
+	sRepo := repository_impl.NewUserStatsRepository(client)
+	txRepo := repository_impl.NewTransactionRepository(client) // 追加
+	questionUsecase := usecase.NewQuestionUsecase(qRepo)
+	attemptUsecase := usecase.NewAttemptUsecase(qRepo, aRepo, sRepo, txRepo)
+	statsUsecase := usecase.NewStatsUsecase(sRepo)
+	adminHandler := admin.NewAdminHandler(questionUsecase)
+	clientHandler := client_handler.NewClientHandler(questionUsecase, attemptUsecase, statsUsecase)
 
 	port := os.Getenv("PORT")
 	if port == "" {
 		port = "8080"
 	}
 
-	mux := http.NewServeMux()
-	mux.HandleFunc("/", func(w http.ResponseWriter, r *http.Request) {
+	r := chi.NewRouter()
+
+	// ミドルウェア
+	r.Use(middleware.Logger)
+	r.Use(middleware.Recoverer)
+	r.Use(corsMiddleware) // Chi用に適応したカスタムCORSミドルウェア
+
+	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
 		fmt.Fprintf(w, "GCP Antigravity Backend is running!")
 	})
 
-	// Admin Routes
-	mux.HandleFunc("POST /admin/exams/{examID}/sets/{setID}/questions", adminHandler.UploadQuestions)
+	// 認証ミドルウェア
+	authMiddleware := internal_middleware.AuthMiddleware(authClient)
 
-	// Client Routes
-	mux.HandleFunc("GET /exams/{examID}/sets/{setID}/questions", clientHandler.GetQuestions)
-	mux.HandleFunc("POST /users/me/attempts", clientHandler.StartAttempt)
+	// 管理者用ルート
+	r.Route("/admin", func(r chi.Router) {
+		r.Use(authMiddleware)
+		r.Post("/exams/{examID}/sets/{examSetID}/questions", adminHandler.UploadQuestions)
+	})
 
-	// CORS Middleware
-	handler := corsMiddleware(mux)
+	// クライアント用ルート
+	r.Group(func(r chi.Router) {
+		r.Use(authMiddleware)
+
+		// Exams
+		r.Route("/exams/{examID}", func(r chi.Router) {
+			r.Get("/sets/{examSetID}/questions", clientHandler.GetQuestions)
+		})
+
+		// Users
+		r.Route("/users/me", func(r chi.Router) {
+			r.Post("/attempts", clientHandler.StartAttempt)
+			r.Put("/attempts/{attemptID}", clientHandler.UpdateAttempt)
+			r.Post("/attempts/{attemptID}/complete", clientHandler.CompleteAttempt)
+			r.Get("/stats/{examID}", clientHandler.GetStats)
+		})
+	})
 
 	srv := &http.Server{
 		Addr:    ":" + port,
-		Handler: handler,
+		Handler: r,
 	}
 
 	go func() {
@@ -76,6 +124,7 @@ func main() {
 	}
 
 	log.Println("Server exiting")
+	return nil
 }
 
 func corsMiddleware(next http.Handler) http.Handler {
@@ -94,3 +143,4 @@ func corsMiddleware(next http.Handler) http.Handler {
 		next.ServeHTTP(w, r)
 	})
 }
+

@@ -1,15 +1,32 @@
 package domain
 
-import "time"
+import (
+	"time"
+
+	"github.com/cockroachdb/errors"
+)
 
 // UserExamStats は「資格ごと(ExamID)」の累積成績です。
 type UserExamStats struct {
-	ExamID        string                 `json:"examId" firestore:"exam_id"`
-	UserID        string                 `json:"userId" firestore:"user_id"`
-	TotalAttempts int                    `json:"totalAttempts" firestore:"total_attempts"`
-	AverageScore  float64                `json:"averageScore" firestore:"average_score"`
-	DomainStats   map[string]DomainScore `json:"domainStats" firestore:"domain_stats"` // 分野ごとの集計
-	LastTakenAt   time.Time              `json:"lastTakenAt" firestore:"last_taken_at"`
+	UserID                 string                 `firestore:"user_id"`
+	ExamID                 string                 `firestore:"exam_id"`
+	TotalAttempts          int                    `firestore:"total_attempts"`
+	TotalScore             int                    `firestore:"total_score"` // 全てのAttemptでの合計正解数
+	TotalQuestionsAnswered int                    `firestore:"total_questions_answered"` // 全てのAttemptでの合計問題数
+	DomainStats            map[string]DomainScore `firestore:"domain_stats"`
+	LastTakenAt            time.Time              `firestore:"last_taken_at"`
+}
+
+// NewUserExamStats は新しいUserExamStatsドメインオブジェクトを生成します。
+func NewUserExamStats(userID, examID string) (*UserExamStats, error) {
+	if userID == "" || examID == "" {
+		return nil, errors.Wrap(ErrInvalidArgument, "統計情報のUserIDとExamIDは必須です")
+	}
+	return &UserExamStats{
+		UserID:      userID,
+		ExamID:      examID,
+		DomainStats: make(map[string]DomainScore),
+	}, nil
 }
 
 // DomainScore は特定分野ごとの成績集計です。
