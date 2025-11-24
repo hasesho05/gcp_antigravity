@@ -3,10 +3,12 @@ package usecase
 import (
 	"context"
 	"math"
+	"reflect"
 	"time"
 
 	"github.com/cockroachdb/errors"
 	"github.com/google/uuid"
+	"github.com/samber/lo"
 
 	"gcp_antigravity/backend/internal/domain"
 	"gcp_antigravity/backend/internal/repository"
@@ -85,7 +87,12 @@ func (u *attemptUsecase) UpdateAttempt(ctx context.Context, userID, attemptID st
 	}
 
 	attempt.CurrentIndex = req.CurrentIndex
-	attempt.Answers = req.Answers
+	if attempt.Answers == nil {
+		attempt.Answers = make(map[string][]string)
+	}
+	for k, v := range req.Answers {
+		attempt.Answers[k] = v
+	}
 	attempt.UpdatedAt = time.Now()
 
 	return u.aRepo.Save(ctx, *attempt)
@@ -109,29 +116,34 @@ func (u *attemptUsecase) CompleteAttempt(ctx context.Context, input *input.Compl
 			return err
 		}
 
-		score := 0
-		qMap := make(map[string]domain.Question)
-		for _, q := range questions {
-			qMap[q.ID] = q
-		}
+		qMap := lo.KeyBy(questions, func(q domain.Question) string {
+			return q.ID
+		})
 
+		score := 0
 		domainCorrect := make(map[string]int)
 		domainTotal := make(map[string]int)
 
-		for qID, userAnswers := range input.Answers {
-			q, ok := qMap[qID]
+		lo.ForEach(lo.Entries(input.Answers), func(entry lo.Entry[string, []string], _ int) {
+			q, ok := qMap[entry.Key]
 			if !ok {
-				continue
+				return // continue
 			}
 			domainTotal[q.Domain]++
-			if isCorrect(userAnswers, q.CorrectAnswers) {
+			if isCorrect(entry.Value, q.CorrectAnswers) {
 				score++
 				domainCorrect[q.Domain]++
 			}
-		}
+		})
 
 		now := time.Now()
-		attempt.Answers = input.Answers
+		// UpdateAttempt と同様に、回答をマージする
+		if attempt.Answers == nil {
+			attempt.Answers = make(map[string][]string)
+		}
+		for k, v := range input.Answers {
+			attempt.Answers[k] = v
+		}
 		attempt.Status = domain.StatusCompleted
 		attempt.Score = score
 		attempt.CompletedAt = &now
@@ -185,21 +197,14 @@ func (u *attemptUsecase) CompleteAttempt(ctx context.Context, input *input.Compl
 	return output.NewAttemptOutput(completedAttempt), nil
 }
 
-// isCorrect is needed by CompleteAttempt
+// isCorrect は、ユーザーの回答と正解が順序を問わず一致するかどうかを判定します。
+// 要素の出現回数も考慮します。
 func isCorrect(userAns, correctAns []string) bool {
 	if len(userAns) != len(correctAns) {
 		return false
 	}
-	// ソートまたはマップチェック。通常は数が少ないため、単純なループで十分です。
-	// またはマップに変換します。
-	cMap := make(map[string]bool)
-	for _, c := range correctAns {
-		cMap[c] = true
-	}
-	for _, u := range userAns {
-		if !cMap[u] {
-			return false
-		}
-	}
-	return true
+
+	// lo.CountValues で各スライスの要素の出現回数を数え、
+	// reflect.DeepEqual でマップが等しいかを比較することで、集合として等価かを確認します。
+	return reflect.DeepEqual(lo.CountValues(userAns), lo.CountValues(correctAns))
 }
