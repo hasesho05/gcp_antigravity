@@ -13,6 +13,7 @@ import (
 	"github.com/cockroachdb/errors"
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
+	"github.com/joho/godotenv"
 
 	"gcp_antigravity/backend/internal/handler/admin"
 	client_handler "gcp_antigravity/backend/internal/handler/client"
@@ -24,6 +25,11 @@ import (
 )
 
 func main() {
+	// Load .env file
+	if err := godotenv.Load(); err != nil {
+		log.Printf("Warning: .env file not found or error loading it: %v", err)
+	}
+
 	// サーバーの起動
 	if err := run(); err != nil {
 		log.Fatalf("サーバーの起動に失敗しました: %v", err)
