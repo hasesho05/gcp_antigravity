@@ -14,7 +14,7 @@
     "format": "biome format --write .",
     "storybook": "storybook dev -p 6006",
     "build-storybook": "storybook build",
-    "gen:types": "quicktype -s schema ../backend/frontend_types_sample.json -o src/types/api.ts --lang typescript"
+    "gen:types": "quicktype ../backend/frontend_types_sample.json -o src/types/api.ts --lang typescript"
   },
   "keywords": [],
   "author": "",

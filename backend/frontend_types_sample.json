@@ -1,65 +1,65 @@
 {
   "User": {
-    "ID": "user123",
-    "Email": "test@example.com",
-    "Role": "pro",
-    "SubscriptionStatus": "active",
-    "CreatedAt": "2023-01-01T00:00:00Z"
+    "id": "user123",
+    "email": "test@example.com",
+    "role": "admin",
+    "subscriptionStatus": "active",
+    "createdAt": "2023-01-01T00:00:00Z"
   },
   "Question": {
-    "ID": "PCD_SET1_001",
-    "ExamID": "professional_cloud_developer",
-    "ExamSetID": "practice_exam_1",
-    "ExamCode": "PCD",
-    "QuestionText": "<p>What is Cloud Run?</p>",
-    "QuestionType": "multiple-choice",
-    "Options": [
+    "id": "PCD_SET1_001",
+    "examId": "professional_cloud_developer",
+    "examSetId": "practice_exam_1",
+    "examCode": "PCD",
+    "question": "<p>What is Cloud Run?</p>",
+    "questionType": "multiple-choice",
+    "answerOptions": [
       {
-        "ID": "a",
-        "Text": "Serverless container platform",
-        "Explanation": "Correct."
+        "id": "a",
+        "answer": "Serverless container platform",
+        "explanation": "Correct. Cloud Run is a fully managed serverless platform."
       },
       {
-        "ID": "b",
-        "Text": "VM",
-        "Explanation": "Incorrect."
+        "id": "b",
+        "answer": "Virtual Machine service",
+        "explanation": "Incorrect. This describes Compute Engine."
       }
     ],
-    "CorrectAnswers": ["a"],
-    "OverallExplanation": "<p>Cloud Run is managed serverless...</p>",
-    "Domain": "Compute",
-    "CreatedAt": "2023-01-01T00:00:00Z"
+    "correctAnswers": ["a"],
+    "overallExplanation": "<p>Cloud Run is a managed serverless platform that enables you to run containers directly on top of Google's scalable infrastructure.</p>",
+    "domain": "Compute",
+    "createdAt": "2023-01-01T00:00:00Z"
   },
   "Attempt": {
-    "ID": "attempt123",
-    "UserID": "user123",
-    "ExamID": "professional_cloud_developer",
-    "ExamSetID": "practice_exam_1",
-    "Status": "in_progress",
-    "Score": 0,
-    "TotalQuestions": 50,
-    "CurrentIndex": 5,
-    "Answers": {
+    "id": "attempt123",
+    "userId": "user123",
+    "examId": "professional_cloud_developer",
+    "examSetId": "practice_exam_1",
+    "status": "in_progress",
+    "score": 0,
+    "totalQuestions": 50,
+    "currentIndex": 5,
+    "answers": {
       "PCD_SET1_001": ["a"]
     },
-    "StartedAt": "2023-01-01T00:00:00Z",
-    "UpdatedAt": "2023-01-01T00:00:00Z",
-    "CompletedAt": null
+    "startedAt": "2023-01-01T00:00:00Z",
+    "updatedAt": "2023-01-01T00:00:00Z",
+    "completedAt": null
   },
   "UserExamStats": {
-    "ExamID": "professional_cloud_developer",
-    "UserID": "user123",
-    "TotalAttempts": 1,
-    "TotalScore": 85,
-    "TotalQuestionsAnswered": 100,
-    "DomainStats": {
+    "examId": "professional_cloud_developer",
+    "userId": "user123",
+    "totalAttempts": 1,
+    "totalScore": 85,
+    "totalQuestionsAnswered": 100,
+    "domainStats": {
       "Compute": {
-        "DomainName": "Compute",
-        "CorrectCount": 8,
-        "TotalCount": 10,
-        "AccuracyRate": 80
+        "domainName": "Compute",
+        "correctCount": 8,
+        "totalCount": 10,
+        "accuracyRate": 80
       }
     },
-    "LastTakenAt": "2023-01-01T00:00:00Z"
+    "lastTakenAt": "2023-01-01T00:00:00Z"
   }
 }

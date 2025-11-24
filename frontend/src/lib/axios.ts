@@ -1,10 +1,8 @@
 import Axios from 'axios';
-
-// Base API URL from environment variables
-const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:8080';
+import { env } from '@/config/env';
 
 export const axios = Axios.create({
-  baseURL: API_URL,
+  baseURL: env.API_URL,
   headers: {
     'Content-Type': 'application/json',
   },
