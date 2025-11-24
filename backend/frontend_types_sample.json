@@ -1,0 +1,65 @@
+{
+  "User": {
+    "ID": "user123",
+    "Email": "test@example.com",
+    "Role": "pro",
+    "SubscriptionStatus": "active",
+    "CreatedAt": "2023-01-01T00:00:00Z"
+  },
+  "Question": {
+    "ID": "PCD_SET1_001",
+    "ExamID": "professional_cloud_developer",
+    "ExamSetID": "practice_exam_1",
+    "ExamCode": "PCD",
+    "QuestionText": "<p>What is Cloud Run?</p>",
+    "QuestionType": "multiple-choice",
+    "Options": [
+      {
+        "ID": "a",
+        "Text": "Serverless container platform",
+        "Explanation": "Correct."
+      },
+      {
+        "ID": "b",
+        "Text": "VM",
+        "Explanation": "Incorrect."
+      }
+    ],
+    "CorrectAnswers": ["a"],
+    "OverallExplanation": "<p>Cloud Run is managed serverless...</p>",
+    "Domain": "Compute",
+    "CreatedAt": "2023-01-01T00:00:00Z"
+  },
+  "Attempt": {
+    "ID": "attempt123",
+    "UserID": "user123",
+    "ExamID": "professional_cloud_developer",
+    "ExamSetID": "practice_exam_1",
+    "Status": "in_progress",
+    "Score": 0,
+    "TotalQuestions": 50,
+    "CurrentIndex": 5,
+    "Answers": {
+      "PCD_SET1_001": ["a"]
+    },
+    "StartedAt": "2023-01-01T00:00:00Z",
+    "UpdatedAt": "2023-01-01T00:00:00Z",
+    "CompletedAt": null
+  },
+  "UserExamStats": {
+    "ExamID": "professional_cloud_developer",
+    "UserID": "user123",
+    "TotalAttempts": 1,
+    "TotalScore": 85,
+    "TotalQuestionsAnswered": 100,
+    "DomainStats": {
+      "Compute": {
+        "DomainName": "Compute",
+        "CorrectCount": 8,
+        "TotalCount": 10,
+        "AccuracyRate": 80
+      }
+    },
+    "LastTakenAt": "2023-01-01T00:00:00Z"
+  }
+}
