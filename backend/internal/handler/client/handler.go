@@ -15,11 +15,17 @@ import (
 )
 
 type ClientHandler struct {
-	usecase usecase.ExamUsecase
+	questionUsecase usecase.QuestionUsecase
+	attemptUsecase  usecase.AttemptUsecase
+	statsUsecase    usecase.StatsUsecase
 }
 
-func NewClientHandler(u usecase.ExamUsecase) *ClientHandler {
-	return &ClientHandler{usecase: u}
+func NewClientHandler(qu usecase.QuestionUsecase, au usecase.AttemptUsecase, su usecase.StatsUsecase) *ClientHandler {
+	return &ClientHandler{
+		questionUsecase: qu,
+		attemptUsecase:  au,
+		statsUsecase:    su,
+	}
 }
 
 func (h *ClientHandler) GetQuestions(w http.ResponseWriter, r *http.Request) {
@@ -28,12 +34,18 @@ func (h *ClientHandler) GetQuestions(w http.ResponseWriter, r *http.Request) {
 	examID := chi.URLParam(r, "examID")
 	examSetID := chi.URLParam(r, "examSetID")
 
-	if examID == "" || examSetID == "" {
-		http.Error(w, "examIDとexamSetIDは必須です", http.StatusBadRequest)
+	input, err := input.NewGetExamQuestions(examSetID)
+	if err != nil {
+		if errors.Is(err, domain.ErrInvalidArgument) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		fmt.Printf("internal server error: %+v\n", err)
+		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
 		return
 	}
 
-	questions, err := h.usecase.GetExamQuestions(r.Context(), examSetID)
+	questions, err := h.questionUsecase.GetExamQuestions(r.Context(), input)
 	if err != nil {
 		if errors.Is(err, domain.ErrNotFound) {
 			http.Error(w, "問題が見つかりませんでした", http.StatusNotFound)
@@ -67,7 +79,7 @@ func (h *ClientHandler) StartAttempt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	attempt, err := h.usecase.StartAttempt(r.Context(), userID, req)
+	attempt, err := h.attemptUsecase.StartAttempt(r.Context(), userID, req)
 	if err != nil {
 		if errors.Is(err, domain.ErrInvalidArgument) {
 			http.Error(w, err.Error(), http.StatusBadRequest)
@@ -97,7 +109,7 @@ func (h *ClientHandler) UpdateAttempt(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	if err := h.usecase.UpdateAttempt(r.Context(), userID, attemptID, req); err != nil {
+	if err := h.attemptUsecase.UpdateAttempt(r.Context(), userID, attemptID, req); err != nil {
 		if errors.Is(err, domain.ErrFailedPrecondition) {
 			http.Error(w, err.Error(), http.StatusConflict)
 			return
@@ -120,13 +132,28 @@ func (h *ClientHandler) CompleteAttempt(w http.ResponseWriter, r *http.Request) 
 	}
 	attemptID := chi.URLParam(r, "attemptID")
 
-	var req input.CompleteAttemptRequest
-	if err := json.NewDecoder(r.Body).Decode(&req); err != nil {
+	var reqBody input.CompleteAttemptRequest
+	if err := json.NewDecoder(r.Body).Decode(&reqBody); err != nil {
 		http.Error(w, "リクエストボディが無効です", http.StatusBadRequest)
 		return
 	}
 
-	attempt, err := h.usecase.CompleteAttempt(r.Context(), userID, attemptID, req)
+	input, err := input.NewCompleteAttempt(userID, attemptID, reqBody.Answers)
+	if err != nil {
+		if errors.Is(err, domain.ErrUnauthenticated) {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		if errors.Is(err, domain.ErrInvalidArgument) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
+		fmt.Printf("internal server error: %+v\n", err)
+		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
+		return
+	}
+
+	attempt, err := h.attemptUsecase.CompleteAttempt(r.Context(), input)
 	if err != nil {
 		if errors.Is(err, domain.ErrFailedPrecondition) {
 			http.Error(w, err.Error(), http.StatusConflict)
@@ -149,20 +176,26 @@ func (h *ClientHandler) GetStats(w http.ResponseWriter, r *http.Request) {
 	}
 	examID := chi.URLParam(r, "examID")
 
-	stats, err := h.usecase.GetUserExamStats(r.Context(), userID, examID)
+	input, err := input.NewGetUserExamStats(userID, examID)
 	if err != nil {
+		if errors.Is(err, domain.ErrUnauthenticated) {
+			http.Error(w, err.Error(), http.StatusUnauthorized)
+			return
+		}
+		if errors.Is(err, domain.ErrInvalidArgument) {
+			http.Error(w, err.Error(), http.StatusBadRequest)
+			return
+		}
 		fmt.Printf("internal server error: %+v\n", err)
 		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
 		return
 	}
 
-	if stats == nil {
-		// 統計情報が存在しない場合は、空のオブジェクトを返す
-		stats = &domain.UserExamStats{
-			ExamID:      examID,
-			UserID:      userID,
-			DomainStats: make(map[string]domain.DomainScore),
-		}
+	stats, err := h.statsUsecase.GetUserExamStats(r.Context(), input)
+	if err != nil {
+		fmt.Printf("internal server error: %+v\n", err)
+		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
+		return
 	}
 
 	w.Header().Set("Content-Type", "application/json")

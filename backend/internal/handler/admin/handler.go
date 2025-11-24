@@ -13,10 +13,10 @@ import (
 )
 
 type AdminHandler struct {
-	usecase usecase.ExamUsecase
+	usecase usecase.QuestionUsecase
 }
 
-func NewAdminHandler(u usecase.ExamUsecase) *AdminHandler {
+func NewAdminHandler(u usecase.QuestionUsecase) *AdminHandler {
 	return &AdminHandler{usecase: u}
 }
 

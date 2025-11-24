@@ -35,9 +35,18 @@ This document outlines key development principles and patterns to follow for thi
 - **Use Constructors for Domain Objects**: Always use a constructor function (e.g., `domain.NewQuestion()`) defined in the domain layer to create new instances of domain objects. This ensures that objects are always created in a valid state.
 - **Validation in Constructors**: Constructors should validate their arguments and return an error if any validation fails. This prevents the creation of invalid domain objects.
 - **Avoid Direct Struct Initialization**: Do not initialize domain structs directly from other layers (e.g., `&domain.Question{...}`). This bypasses validation and can lead to inconsistent or invalid object states.
+- **コンストラクタの使用の徹底**: ドメインオブジェクトを初期化する際は、構造体を直接初期化する (`&domain.UserExamStats{...}`) のではなく、必ずコンストラクタ（例: `domain.NewUserExamStats()`）を使用してください。これにより、オブジェクトの一貫性とドメインルールが保証されます。
 
 ## 6. Utility Functions
 
 - **Pointer Helpers**: Use `util.ToPointer` and `util.FromPointer` for converting between values and pointers, especially when dealing with optional fields or interfacing with external libraries that require pointers.
 - **`lo.Map` Helper**: When using `github.com/samber/lo`'s `Map` function and the index is not required in the iteratee, prefer using `util.Map` for cleaner code.
 
+## 7. Usecase Layer Refactoring
+
+- **Use Input/Output DTOs**: Usecase methods should not take domain objects as arguments or return them directly. Instead, use dedicated Data Transfer Objects (DTOs) defined in the `usecase/input` and `usecase/output` packages.
+- **Clear Separation**: This practice creates a clear separation between the application's core business logic (domain) and its orchestration layer (usecase). The `input` objects encapsulate the parameters required for a usecase, while the `output` objects format the data for the presentation layer (e.g., handlers).
+- **Validation in Input Constructors**: Validation of parameters should be performed within the constructor of the `input` DTO (e.g., `input.NewCompleteAttempt()`). This ensures that the usecase always receives valid data.
+- **Example**:
+    - **Before**: `func (u *myUsecase) DoSomething(ctx context.Context, userID string, param1 int) (*domain.MyObject, error)`
+    - **After**: `func (u *myUsecase) DoSomething(ctx context.Context, input *input.DoSomething) (*output.MyObject, error)`

@@ -49,9 +49,11 @@ func run() error {
 	aRepo := repository_impl.NewAttemptRepository(client)
 	sRepo := repository_impl.NewUserStatsRepository(client)
 	txRepo := repository_impl.NewTransactionRepository(client) // 追加
-	examUsecase := usecase.NewExamUsecase(qRepo, aRepo, sRepo, txRepo) // txRepoを追加
-	adminHandler := admin.NewAdminHandler(examUsecase)
-	clientHandler := client_handler.NewClientHandler(examUsecase)
+	questionUsecase := usecase.NewQuestionUsecase(qRepo)
+	attemptUsecase := usecase.NewAttemptUsecase(qRepo, aRepo, sRepo, txRepo)
+	statsUsecase := usecase.NewStatsUsecase(sRepo)
+	adminHandler := admin.NewAdminHandler(questionUsecase)
+	clientHandler := client_handler.NewClientHandler(questionUsecase, attemptUsecase, statsUsecase)
 
 	port := os.Getenv("PORT")
 	if port == "" {
