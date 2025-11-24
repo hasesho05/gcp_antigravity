@@ -137,7 +137,13 @@ func (u *attemptUsecase) CompleteAttempt(ctx context.Context, input *input.Compl
 		})
 
 		now := time.Now()
-		attempt.Answers = input.Answers
+		// UpdateAttempt と同様に、回答をマージする
+		if attempt.Answers == nil {
+			attempt.Answers = make(map[string][]string)
+		}
+		for k, v := range input.Answers {
+			attempt.Answers[k] = v
+		}
 		attempt.Status = domain.StatusCompleted
 		attempt.Score = score
 		attempt.CompletedAt = &now
