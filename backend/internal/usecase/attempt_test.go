@@ -141,3 +141,67 @@ func TestUpdateAttempt_MergesAnswers(t *testing.T) {
 	assert.Equal(t, []string{"d"}, capturedAttempt.Answers["q3"]) // Should be added
 	assert.Equal(t, 5, capturedAttempt.CurrentIndex)
 }
+
+func TestIsCorrect(t *testing.T) {
+	tests := []struct {
+		name       string
+		userAns    []string
+		correctAns []string
+		expected   bool
+	}{
+		{
+			name:       "同じ要素を持つが順序が異なる場合",
+			userAns:    []string{"1", "2", "3"},
+			correctAns: []string{"2", "3", "1"},
+			expected:   true,
+		},
+		{
+			name:       "完全に一致する場合",
+			userAns:    []string{"a", "b"},
+			correctAns: []string{"a", "b"},
+			expected:   true,
+		},
+		{
+			name:       "要素の数が異なる場合",
+			userAns:    []string{"a"},
+			correctAns: []string{"a", "b"},
+			expected:   false,
+		},
+		{
+			name:       "要素は同じだが重複回数が異なる場合",
+			userAns:    []string{"a", "a", "b"},
+			correctAns: []string{"a", "b", "b"},
+			expected:   false,
+		},
+		{
+			name:       "要素が異なる場合",
+			userAns:    []string{"a", "b"},
+			correctAns: []string{"c", "d"},
+			expected:   false,
+		},
+		{
+			name:       "片方が空のスライス",
+			userAns:    []string{},
+			correctAns: []string{"a"},
+			expected:   false,
+		},
+		{
+			name:       "両方空のスライス",
+			userAns:    []string{},
+			correctAns: []string{},
+			expected:   true,
+		},
+		{
+			name:       "重複がある場合でも順序が異なる場合",
+			userAns:    []string{"a", "a", "b"},
+			correctAns: []string{"a", "b", "a"},
+			expected:   true,
+		},
+	}
+
+	for _, tt := range tests {
+		t.Run(tt.name, func(t *testing.T) {
+			assert.Equal(t, tt.expected, isCorrect(tt.userAns, tt.correctAns), tt.name)
+		})
+	}
+}
