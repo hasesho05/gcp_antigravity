@@ -12,6 +12,11 @@ type QuestionRepository interface {
 	FindByExamSetID(ctx context.Context, examSetID string) ([]domain.Question, error)
 }
 
+// ExamRepository はExamエンティティの永続化を管理します。
+type ExamRepository interface {
+	FindAll(ctx context.Context) ([]domain.Exam, error)
+}
+
 // AttemptRepository は受験記録エンティティの永続化を管理します。
 type AttemptRepository interface {
 	Save(ctx context.Context, attempt domain.Attempt) error

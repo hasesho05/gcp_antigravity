@@ -1,0 +1,5 @@
+packages:
+  - path: "gcp_antigravity/backend/internal/domain"
+    output_path: "../frontend/src/types/api.ts"
+    type_mappings:
+      time.Time: "string"

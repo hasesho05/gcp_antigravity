@@ -43,9 +43,9 @@ DNS, CDN, Frontend Hosting
 
 Tools
 
-Quicktype
+Tygo
 
-Go構造体からTS型定義を自動生成
+Go構造体からTS型定義を自動生成 (Union型対応)
 
 🏗 Architecture
 
@@ -98,8 +98,7 @@ Error Handling: github.com/cockroachdb/errors を使用し、スタックトレ�
 │   └── infra                # インフラ層 (ドライバ/クライアント)
 │       └── firestore        # Firestore共通処理
 │           └── client.go    # Client初期化、共通ヘルパー
-└── scripts
-    └── dump_json.go         # Quicktype用JSON生成スクリプト
+├── tygo.yaml                # Tygo設定ファイル
 
 
 🛠 Development Commands
@@ -111,13 +110,13 @@ make run
 
 2. Generate TypeScript Types (for Frontend)
 
-GoのInput/Output DTOおよびDomain定義からJSONサンプルを出力し、それを元にフロントエンド用の型定義を作成します。
+Goのドメイン定義からTypeScriptの型定義を自動生成します（Tygo使用）。
 
-# 1. JSONサンプルを出力
-make generate-sample > frontend_types_sample.json
+```bash
+make generate-types
+```
 
-# 2. (Optional) Quicktype CLIでTS型を生成
-quicktype -o frontend/src/types/api.ts --src frontend_types_sample.json --src-lang json --lang ts
+`frontend/src/types/api.ts` が更新されます。
 
 
 3. Test

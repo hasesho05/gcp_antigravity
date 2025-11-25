@@ -44,6 +44,8 @@ func NewAttempt(id, userID, examID, examSetID string, totalQuestions int, now ti
 }
 
 // AttemptStatus は受験の進捗状態を定義します。
+//
+// tygo:enum
 type AttemptStatus string
 
 const (

@@ -48,12 +48,16 @@ func run() error {
 	qRepo := repository_impl.NewQuestionRepository(client)
 	aRepo := repository_impl.NewAttemptRepository(client)
 	sRepo := repository_impl.NewUserStatsRepository(client)
-	txRepo := repository_impl.NewTransactionRepository(client) // 追加
+	txRepo := repository_impl.NewTransactionRepository(client)
+	examRepo := repository_impl.NewExamRepository(client) // 追加
+
 	questionUsecase := usecase.NewQuestionUsecase(qRepo)
 	attemptUsecase := usecase.NewAttemptUsecase(qRepo, aRepo, sRepo, txRepo)
 	statsUsecase := usecase.NewStatsUsecase(sRepo)
+	examUsecase := usecase.NewExamUsecase(examRepo, qRepo, aRepo, sRepo, txRepo)
+
 	adminHandler := admin.NewAdminHandler(questionUsecase)
-	clientHandler := client_handler.NewClientHandler(questionUsecase, attemptUsecase, statsUsecase)
+	clientHandler := client_handler.NewClientHandler(questionUsecase, attemptUsecase, statsUsecase, examUsecase)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -85,8 +89,11 @@ func run() error {
 		r.Use(authMiddleware)
 
 		// Exams
-		r.Route("/exams/{examID}", func(r chi.Router) {
-			r.Get("/sets/{examSetID}/questions", clientHandler.GetQuestions)
+		r.Route("/exams", func(r chi.Router) {
+			r.Get("/", clientHandler.ListExams)
+			r.Route("/{examID}", func(r chi.Router) {
+				r.Get("/sets/{examSetID}/questions", clientHandler.GetQuestions)
+			})
 		})
 
 		// Users

@@ -107,3 +107,16 @@ JSON形式で複数の問題を一度に登録します。
 | Method | Endpoint                       | Description                                |
 | :----- | :----------------------------- | :----------------------------------------- |
 | GET    | `/users/me/stats/{examID}`     | 成績参照 (指定した資格（例: PCA）に関する累積スコアと、分野別（Domain別）の正答率データを取得します。) |
+
+## 4. 技術スタック (Tech Stack)
+
+### Backend
+*   **Language:** Go (1.22+)
+*   **Framework:** Standard net/http + Chi Router
+*   **Database:** Firestore
+*   **Tools:** Tygo (Go構造体からTypeScript型定義を自動生成)
+
+### Frontend
+*   **Framework:** React (Vite)
+*   **Language:** TypeScript
+*   **Styling:** Tailwind CSS

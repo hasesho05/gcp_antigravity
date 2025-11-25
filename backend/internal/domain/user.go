@@ -15,6 +15,7 @@ type User struct {
 // UserRole はユーザーの権限レベルを定義します。
 type UserRole string
 
+// tygo:enum
 const (
 	RoleFree  UserRole = "free"  // 無料ユーザー
 	RolePro   UserRole = "pro"   // 有料サブスクリプションユーザー
@@ -22,6 +23,8 @@ const (
 )
 
 // SubscriptionStatus はサブスクリプションの状態を定義します。
+//
+// tygo:enum
 type SubscriptionStatus string
 
 const (

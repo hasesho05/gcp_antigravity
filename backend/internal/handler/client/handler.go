@@ -18,13 +18,15 @@ type ClientHandler struct {
 	questionUsecase usecase.QuestionUsecase
 	attemptUsecase  usecase.AttemptUsecase
 	statsUsecase    usecase.StatsUsecase
+	examUsecase     usecase.ExamUsecase
 }
 
-func NewClientHandler(qu usecase.QuestionUsecase, au usecase.AttemptUsecase, su usecase.StatsUsecase) *ClientHandler {
+func NewClientHandler(qu usecase.QuestionUsecase, au usecase.AttemptUsecase, su usecase.StatsUsecase, eu usecase.ExamUsecase) *ClientHandler {
 	return &ClientHandler{
 		questionUsecase: qu,
 		attemptUsecase:  au,
 		statsUsecase:    su,
+		examUsecase:     eu,
 	}
 }
 
@@ -200,4 +202,16 @@ func (h *ClientHandler) GetStats(w http.ResponseWriter, r *http.Request) {
 
 	w.Header().Set("Content-Type", "application/json")
 	json.NewEncoder(w).Encode(stats)
+}
+
+func (h *ClientHandler) ListExams(w http.ResponseWriter, r *http.Request) {
+	exams, err := h.examUsecase.ListExams(r.Context())
+	if err != nil {
+		fmt.Printf("internal server error: %+v\n", err)
+		http.Error(w, "サーバー内部エラーが発生しました", http.StatusInternalServerError)
+		return
+	}
+
+	w.Header().Set("Content-Type", "application/json")
+	json.NewEncoder(w).Encode(exams)
 }
