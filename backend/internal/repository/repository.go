@@ -3,7 +3,7 @@ package repository
 import (
 	"context"
 
-	"gcp_antigravity/backend/internal/domain"
+	"nearline/backend/internal/domain"
 )
 
 // QuestionRepository は問題エンティティの永続化を管理します。

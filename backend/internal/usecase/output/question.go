@@ -1,6 +1,6 @@
 package output
 
-import "gcp_antigravity/backend/internal/domain"
+import "nearline/backend/internal/domain"
 
 func NewQuestions(questions []domain.Question) []domain.Question {
 	return questions

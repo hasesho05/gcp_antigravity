@@ -12,7 +12,8 @@ import (
 
 func NewClient(ctx context.Context) *firestore.Client {
 	opt := option.WithCredentialsFile(os.Getenv("GOOGLE_APPLICATION_CREDENTIALS"))
-	app, err := firebase.NewApp(ctx, nil, opt)
+	conf := &firebase.Config{ProjectID: os.Getenv("GCP_PROJECT_ID")}
+	app, err := firebase.NewApp(ctx, conf, opt)
 	if err != nil {
 		log.Fatalf("error initializing app: %v\n", err)
 	}

@@ -7,8 +7,8 @@ import (
 	"github.com/cockroachdb/errors"
 	"google.golang.org/api/iterator"
 
-	"gcp_antigravity/backend/internal/domain"
-	"gcp_antigravity/backend/internal/repository"
+	"nearline/backend/internal/domain"
+	"nearline/backend/internal/repository"
 )
 
 type examRepository struct {

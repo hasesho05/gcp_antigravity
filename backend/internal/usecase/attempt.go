@@ -10,10 +10,10 @@ import (
 	"github.com/google/uuid"
 	"github.com/samber/lo"
 
-	"gcp_antigravity/backend/internal/domain"
-	"gcp_antigravity/backend/internal/repository"
-	"gcp_antigravity/backend/internal/usecase/input"
-	"gcp_antigravity/backend/internal/usecase/output"
+	"nearline/backend/internal/domain"
+	"nearline/backend/internal/repository"
+	"nearline/backend/internal/usecase/input"
+	"nearline/backend/internal/usecase/output"
 )
 
 type AttemptUsecase interface {

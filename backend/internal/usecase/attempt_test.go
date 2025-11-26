@@ -8,8 +8,8 @@ import (
 	"github.com/stretchr/testify/assert"
 	"github.com/stretchr/testify/mock"
 
-	"gcp_antigravity/backend/internal/domain"
-	"gcp_antigravity/backend/internal/usecase/input"
+	"nearline/backend/internal/domain"
+	"nearline/backend/internal/usecase/input"
 )
 
 // MockAttemptRepository is a mock implementation of AttemptRepository

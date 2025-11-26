@@ -6,7 +6,7 @@
 
 このプロジェクトは、GoとFirestoreを使用して、GCP認定資格の模擬試験を提供するバックエンドAPIを開発することを目的としています。
 
-- **プロジェクト名:** GCP認定資格プラットフォーム (Antigravity Backend)
+- **プロジェクト名:** nearline
 - **技術スタック:** Go (Cloud Run), Firebase Firestore, Chi Router
 - **リポジトリURL:** [開発開始時に設定]
 

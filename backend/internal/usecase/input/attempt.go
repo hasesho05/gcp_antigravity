@@ -1,7 +1,7 @@
 package input
 
 import (
-	"gcp_antigravity/backend/internal/domain"
+	"nearline/backend/internal/domain"
 
 	"github.com/cockroachdb/errors"
 )
