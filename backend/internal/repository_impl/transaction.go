@@ -4,7 +4,7 @@ import (
 	"context"
 
 	"cloud.google.com/go/firestore"
-	"gcp_antigravity/backend/internal/repository"
+	"nearline/backend/internal/repository"
 )
 
 // transactionKeyはcontext.Valueのキーとして使用されます。

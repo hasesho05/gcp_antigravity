@@ -14,13 +14,15 @@ import (
 	"github.com/go-chi/chi/v5"
 	"github.com/go-chi/chi/v5/middleware"
 
-	"gcp_antigravity/backend/internal/handler/admin"
-	client_handler "gcp_antigravity/backend/internal/handler/client"
-	"gcp_antigravity/backend/internal/infra/auth"
-	"gcp_antigravity/backend/internal/infra/firestore"
-	internal_middleware "gcp_antigravity/backend/internal/middleware"
-	"gcp_antigravity/backend/internal/repository_impl"
-	"gcp_antigravity/backend/internal/usecase"
+	"nearline/backend/internal/handler/admin"
+	client_handler "nearline/backend/internal/handler/client"
+	"nearline/backend/internal/infra/auth"
+	"nearline/backend/internal/infra/firestore"
+	internal_middleware "nearline/backend/internal/middleware"
+	"nearline/backend/internal/repository_impl"
+	"nearline/backend/internal/usecase"
+
+	"github.com/joho/godotenv"
 )
 
 func main() {
@@ -31,6 +33,12 @@ func main() {
 }
 
 func run() error {
+	// .envファイルを読み込む (開発環境用)
+	// 本番環境では環境変数が直接設定されるため、ファイルがなくてもエラーにしない
+	if err := godotenv.Load(); err != nil {
+		log.Println("No .env file found")
+	}
+
 	ctx, stop := signal.NotifyContext(context.Background(), os.Interrupt, syscall.SIGTERM)
 	defer stop()
 
@@ -72,8 +80,7 @@ func run() error {
 	r.Use(corsMiddleware) // Chi用に適応したカスタムCORSミドルウェア
 
 	r.Get("/", func(w http.ResponseWriter, r *http.Request) {
-		fmt.Fprintf(w, "GCP Antigravity Backend is running!")
-	})
+					fmt.Fprintf(w, "nearline Backend is running!")	})
 
 	// 認証ミドルウェア
 	authMiddleware := internal_middleware.AuthMiddleware(authClient)
@@ -84,17 +91,23 @@ func run() error {
 		r.Post("/exams/{examID}/sets/{examSetID}/questions", adminHandler.UploadQuestions)
 	})
 
-	// クライアント用ルート
-	r.Group(func(r chi.Router) {
-		r.Use(authMiddleware)
+	// Exams (Public & Protected mixed)
+	r.Route("/exams", func(r chi.Router) {
+		// Public: List Exams
+		r.Get("/", clientHandler.ListExams)
 
-		// Exams
-		r.Route("/exams", func(r chi.Router) {
-			r.Get("/", clientHandler.ListExams)
+		// Protected: Exam Details & Questions
+		r.Group(func(r chi.Router) {
+			r.Use(authMiddleware)
 			r.Route("/{examID}", func(r chi.Router) {
 				r.Get("/sets/{examSetID}/questions", clientHandler.GetQuestions)
 			})
 		})
+	})
+
+	// クライアント用ルート (Authenticated)
+	r.Group(func(r chi.Router) {
+		r.Use(authMiddleware)
 
 		// Users
 		r.Route("/users/me", func(r chi.Router) {

@@ -1,13 +1,20 @@
 import { ExamCard } from "../../exam/components/ExamCard";
+import { useExams } from "../api/getExams";
+import type { Exam } from "@/types/api";
 
 export function HomePage() {
-  // 12個のダミーデータ生成
-  const exams = Array.from({ length: 12 }).map((_, i) => ({
-    id: `exam-${i}`,
-    title: i === 0 ? "Cloud Digital Leader" : i < 4 ? "Associate Cloud Engineer" : "Professional Cloud Architect",
-    isPro: i > 0, // 最初だけ無料
-    domainCount: 4 + (i % 3),
-  }));
+  const { exams: apiExams, isLoading } = useExams();
+
+  const exams = apiExams?.map((exam: Exam) => ({
+    id: exam.id,
+    title: exam.name,
+    isPro: exam.code.startsWith('P'), // 仮のロジック: Pで始まるコードはProとする
+    domainCount: 4, // 仮の値
+  })) || [];
+
+  if (isLoading) {
+    return <div className="flex justify-center items-center min-h-screen">Loading...</div>;
+  }
 
   return (
     <div className="min-h-screen bg-background text-foreground flex flex-col">
@@ -16,7 +23,7 @@ export function HomePage() {
         <div className="container mx-auto h-16 flex items-center px-4">
           <div className="flex items-center gap-2 font-bold text-xl tracking-tighter">
             <div className="w-6 h-6 rounded bg-linear-to-br from-gcp-blue to-gcp-red flex items-center justify-center text-white text-xs">A</div>
-            <span>Antigravity</span>
+            <span>nearline</span>
           </div>
         </div>
       </header>

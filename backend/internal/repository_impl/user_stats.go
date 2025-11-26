@@ -8,8 +8,8 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
-	"gcp_antigravity/backend/internal/domain"
-	"gcp_antigravity/backend/internal/repository"
+	"nearline/backend/internal/domain"
+	"nearline/backend/internal/repository"
 )
 
 type userStatsRepository struct {

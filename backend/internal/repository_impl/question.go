@@ -6,8 +6,8 @@ import (
 	"cloud.google.com/go/firestore"
 	"github.com/cockroachdb/errors"
 
-	"gcp_antigravity/backend/internal/domain"
-	"gcp_antigravity/backend/internal/repository"
+	"nearline/backend/internal/domain"
+	"nearline/backend/internal/repository"
 )
 
 type questionRepository struct {

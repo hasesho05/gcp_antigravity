@@ -1,4 +1,4 @@
-module gcp_antigravity/backend
+module nearline/backend
 
 go 1.24.0
 
@@ -10,6 +10,7 @@ require (
 	github.com/cockroachdb/errors v1.12.0
 	github.com/go-chi/chi/v5 v5.2.3
 	github.com/google/uuid v1.6.0
+	github.com/joho/godotenv v1.5.1
 	github.com/samber/lo v1.52.0
 	github.com/stretchr/testify v1.10.0
 	google.golang.org/api v0.256.0

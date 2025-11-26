@@ -7,9 +7,9 @@ import (
 
 	"github.com/cockroachdb/errors"
 
-	"gcp_antigravity/backend/internal/domain"
-	"gcp_antigravity/backend/internal/usecase"
-	"gcp_antigravity/backend/internal/usecase/input"
+	"nearline/backend/internal/domain"
+	"nearline/backend/internal/usecase"
+	"nearline/backend/internal/usecase/input"
 )
 
 type AdminHandler struct {
