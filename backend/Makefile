@@ -10,3 +10,6 @@ generate-types:
 
 test:
 	/usr/local/go/bin/go test ./...
+
+seed-questions:
+	/usr/local/go/bin/go run cmd/seed_questions/main.go

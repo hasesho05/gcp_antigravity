@@ -50,3 +50,53 @@ This document outlines key development principles and patterns to follow for thi
 - **Example**:
     - **Before**: `func (u *myUsecase) DoSomething(ctx context.Context, userID string, param1 int) (*domain.MyObject, error)`
     - **After**: `func (u *myUsecase) DoSomething(ctx context.Context, input *input.DoSomething) (*output.MyObject, error)`
+
+## 8. Domain Models & Data Structure Quick Reference
+
+### 🧩 Domain Models
+
+アプリケーションの中核となるドメインモデルの解説です。
+
+#### 1. Exam (資格試験)
+GCP認定試験そのものを表します（例: "Professional Cloud Developer"）。
+- `ID`: 資格ID (e.g. `professional-cloud-developer`)
+- `Code`: 資格コード (e.g. `PCD`)
+
+#### 2. ExamSet (模擬試験セット)
+1つの資格試験に含まれる、50問1セットの模擬試験単位です。
+- `ID`: セットID (e.g. `practice_exam_1`)
+- `ExamID`: 親となる資格ID
+
+#### 3. Question (問題)
+個々の問題データです。
+- `ID`: 問題ID (e.g. `PCD_SET1_001`)
+- `QuestionType`: `multiple-choice` (単一選択) または `multi-select` (複数選択)
+- `Domain`: 出題分野 (e.g. "Identity and Security")
+- `OverallExplanation`: 全体の解説
+
+#### 4. User (ユーザー)
+アプリケーションの利用者です。Firebase Authと連携します。
+- `Role`: `free` (無料), `pro` (有料), `admin` (管理者)
+- `SubscriptionStatus`: サブスクリプションの状態
+
+#### 5. Attempt (受験)
+ユーザーが模擬試験を1回受験した履歴を表します。
+- `Status`: `in_progress` (受験中), `paused` (中断), `completed` (完了)
+- `Answers`: ユーザーの回答状況 (Map形式)
+- `Score`: 正解数
+
+#### 6. UserExamStats (成績統計)
+ユーザーの資格ごとの累積成績です。
+- `DomainStats`: 分野ごとの正答率などの統計情報
+- `AccuracyRate`: 全体の正答率
+
+### 🔥 Firestore Data Structure
+
+```
+exams/{examID}
+  ├── sets/{setID} (ExamSet)
+  │     ├── questions/{questionID} (Question)
+```
+
+- **ExamSet**: 模擬試験のセット（例: "Practice Exam 1"）
+- **Question**: 個々の問題データ

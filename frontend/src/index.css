@@ -1,25 +1,26 @@
 @import "tailwindcss";
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
-    --primary: 217 91% 60%; /* GCP Blue (Light mode) */
-    --primary-foreground: 210 40% 98%;
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
-    --destructive: 0 84.2% 60.2%;
+    --background: 230 15% 10%; /* 深い暗色 (Main BG) */
+    --foreground: 210 40% 98%;
+    --card: 230 15% 14%;      /* 少し明るい暗色 (Card BG) */
+    --card-foreground: 210 40% 98%;
+    --popover: 230 15% 14%;
+    --popover-foreground: 210 40% 98%;
+    --primary: 217 91% 60%;   /* GCP Blue (#4285F4) */
+    --primary-foreground: 0 0% 100%;
+    --secondary: 226 15% 20%;
+    --secondary-foreground: 210 40% 98%;
+    --muted: 226 15% 20%;
+    --muted-foreground: 215 20.2% 65.1%;
+    --accent: 226 15% 25%;    /* Hover時の色 */
+    --accent-foreground: 210 40% 98%;
+    --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
+    --border: 226 15% 20%;
+    --input: 226 15% 20%;
     --ring: 217 91% 60%;
     --radius: 0.5rem;
   }
@@ -110,6 +111,25 @@
     @apply border-border outline-ring/50;
   }
   body {
-    @apply bg-background text-foreground antialiased;
+    @apply text-foreground antialiased;
+    font-family: 'Inter', sans-serif;
+    background: radial-gradient(circle at top right, rgba(251, 188, 5, 0.15), transparent 40%),
+                linear-gradient(135deg, #020817 0%, #0f172a 100%);
+    min-height: 100vh;
+  }
+}
+
+@layer utilities {
+  .text-gradient {
+    @apply bg-clip-text text-transparent;
+    background-image: linear-gradient(135deg, #4285F4 0%, #FBBC05 100%);
+  }
+  .btn-gradient {
+    background-image: linear-gradient(135deg, #4285F4 0%, #FBBC05 100%);
+    transition: all 0.3s ease;
+  }
+  .btn-gradient:hover {
+    filter: brightness(1.1);
+    box-shadow: 0 0 20px rgba(66, 133, 244, 0.5);
   }
 }

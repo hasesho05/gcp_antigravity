@@ -1,0 +1,34 @@
+# .air.toml
+# このファイルのルートディレクトリ
+root = "."
+# 一時ディレクトリ
+tmp_dir = "tmp"
+
+[build]
+# ビルドコマンド
+cmd = "go build -o ./tmp/main cmd/api/main.go"
+# 生成されるバイナリのパス
+bin = "tmp/main"
+# 監視するファイルの拡張子
+include_ext = ["go", "tpl", "tmpl", "html", "env"]
+# 監視対象外のディレクトリ
+exclude_dir = ["assets", "tmp", "vendor", "frontend", "node_modules"]
+# ログファイル
+log = "air-errors.log"
+# ビルドの遅延 (ミリ秒)
+delay = 1000
+
+[log]
+# ログに時間を表示
+time = true
+
+[color]
+# ログの各パーツの色をカスタマイズ
+main = "magenta"
+watcher = "cyan"
+build = "yellow"
+runner = "green"
+
+[misc]
+# 終了時にtmpディレクトリを削除
+clean_on_exit = true

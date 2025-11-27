@@ -1,0 +1,54 @@
+{
+  "questions": [
+    {
+      "question": "あるデータ分析チームが Cloud Storage バケットに保存されたデータにアクセスする必要があります。最小権限の原則に基づき、チームメンバーにはどのようなロールを付与するべきでしょうか？",
+      "questionType": "multiple-choice",
+      "answerOptions": [
+        {
+          "answer": "Storage Admin（roles/storage.admin）",
+          "explanation": "Storage Adminロールは、バケットとオブジェクトの作成、更新、削除、アクセスポリシーの管理など、すべてのStorage関連操作を実行できる権限を持ちます。この場合、データへのアクセスだけが必要なので、このロールは過剰な権限を与えることになります。"
+        },
+        {
+          "answer": "Storage Object Viewer（roles/storage.objectViewer）",
+          "explanation": "Storage Object Viewerロールはバケット内のオブジェクトを読み取る権限のみを付与します。データ分析チームがデータの閲覧のみを必要とする場合、最小権限の原則に従うとこのロールが最適です。バケットの変更やオブジェクトの書き込みはできません。"
+        },
+        {
+          "answer": "Storage Object Creator（roles/storage.objectCreator）",
+          "explanation": "Storage Object Creatorロールはバケットにオブジェクトをアップロードする権限を持ちますが、既存のオブジェクトを読み取る権限はありません。データ分析チームはデータの読み取りが必要なので、このロールでは目的を達成できません。"
+        },
+        {
+          "answer": "Storage Object Admin（roles/storage.objectAdmin）",
+          "explanation": "Storage Object Adminロールはバケット内のオブジェクトの読み取り、作成、更新、削除の権限を持ちます。データ分析チームが既存データの読み取りのみを必要とする場合、このロールは必要以上の権限を付与することになり、最小権限の原則に反します。"
+        }
+      ],
+      "overallExplanation": "Cloud Storageのアクセス権限を付与する際は、ユーザーが必要とする最小限の権限のみを与えることが重要です。データ分析チームがバケット内のデータを「読み取る」だけであれば、Storage Object Viewer（roles/storage.objectViewer）ロールが最適です。このロールはオブジェクトの読み取りのみを許可し、変更や削除の権限は与えません。Storage AdminやStorage Object Adminなどのロールは管理操作も含む広範な権限を持つため、単にデータを分析するチームには過剰な権限となります。最小権限の原則に従い、必要な操作のみを許可するロールを選択することで、セキュリティリスクを最小限に抑えることができます。",
+      "correctAnswers": "2",
+      "domain": "IAMとセキュリティ"
+    },
+    {
+      "question": "開発チームがGoogle Kubernetes Engine（GKE）クラスタで新しいアプリケーションを展開しています。クラスタ内のリソース使用状況を監視するために、どのツールを使用するべきでしょうか？",
+      "questionType": "multiple-choice",
+      "answerOptions": [
+        {
+          "answer": "Cloud Monitoring（旧Stackdriver Monitoring）",
+          "explanation": "Cloud Monitoringは、GKEクラスタを含むGCPリソースの監視に最適なツールです。CPUやメモリの使用率、ポッドの状態、ノードのヘルスなど、クラスタのパフォーマンスメトリクスを収集し、可視化することができます。また、異常を検出するためのアラートも設定できます。"
+        },
+        {
+          "answer": "Cloud Deployment Manager",
+          "explanation": "Cloud Deployment Managerはインフラストラクチャをコードとして管理するためのツールで、GCPリソースのデプロイと管理を自動化するために使用されます。これはリソースの使用状況を監視するためのツールではなく、監視機能は提供していません。"
+        },
+        {
+          "answer": "Cloud Source Repositories",
+          "explanation": "Cloud Source Repositoriesは、プライベートGitリポジトリを提供するサービスです。コードの保存と管理が主な目的であり、GKEクラスタのリソース使用状況の監視には使用できません。"
+        },
+        {
+          "answer": "Cloud Scheduler",
+          "explanation": "Cloud Schedulerは、特定のスケジュールに基づいてジョブを実行するためのフルマネージドcronジョブサービスです。これは定期的なタスクを自動化するためのものであり、GKEクラスタのリソース監視機能は提供していません。"
+        }
+      ],
+      "overallExplanation": "GKEクラスタのリソース使用状況を監視するためには、Cloud Monitoring（旧称Stackdriver Monitoring）が最適なツールです。Cloud Monitoringは、クラスタ内のノード、ポッド、コンテナレベルのメトリクスを収集し、ダッシュボードで可視化できます。CPU使用率、メモリ消費量、ディスク使用量、ネットワークトラフィックなどの重要なメトリクスを追跡できます。また、特定のしきい値を超えた場合にアラートを発生させることも可能です。GKEクラスタは自動的にCloud Monitoringと統合されており、追加の設定なしで基本的なメトリクスの収集が開始されます。他のサービス（Cloud Deployment Manager、Cloud Source Repositories、Cloud Scheduler）はそれぞれ特定の目的を持っていますが、リソース監視機能は提供していません。",
+      "correctAnswers": "1",
+      "domain": "モニタリングと運用管理"
+    }
+  ]
+}

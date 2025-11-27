@@ -5,35 +5,52 @@ GCP認定資格プラットフォーム バックエンドスタイルガイド�
 │       └── main.go          # エントリーポイント (DIとルーティング)
 ├── internal
 │   ├── domain               # 1. ドメイン層 (純粋なエンティティ)
-│   │   ├── user.go          # User, Role, SubscriptionStatus
-│   │   ├── question.go      # Question, AnswerOption
-│   │   ├── attempt.go       # Attempt, AttemptStatus
-│   │   ├── stats.go         # UserExamStats, DomainScore
-│   │   └── error.go         # Domain Errors
+│   │   ├── user.go
+│   │   ├── exam.go
+│   │   ├── exam_set.go
+│   │   ├── question.go
+│   │   ├── attempt.go
+│   │   ├── stats.go
+│   │   └── error.go
 │   ├── handler              # 2. プレゼンテーション層
-│   │   ├── admin            # 管理者用ハンドラ
-│   │   │   └── handler.go
-│   │   └── client           # クライアント用ハンドラ
-│   │       └── handler.go
+│   │   ├── admin
+│   │   └── client
 │   ├── usecase              # 3. ユースケース層 (Interactor)
-│   │   ├── exam.go          # UseCase実装
-│   │   ├── input            # Input DTO (Request)
-│   │   │   └── exam.go
-│   │   └── output           # Output DTO (Response)
-│   │       └── exam.go
+│   │   ├── exam.go
+│   │   ├── input
+│   │   └── output
 │   ├── repository           # 4. リポジトリインターフェース
 │   │   └── repository.go
 │   ├── repository_impl      # 5. リポジトリ実装層
-│   │   └── exam.go          # ExamRepositoryの実装
+│   │   └── exam.go
 │   └── infra                # 6. インフラ層 (Firestoreドライバ)
 │       └── firestore
-│           └── client.go    # Client初期化、共通ヘルパー
+│           └── client.go
 └── scripts
     └── dump_json.go         # Quicktype用JSON生成スクリプト
 3. Goコーディング規則3.1. ドメインモデルの命名規則Struct名は単数形 (User, Question, Attempt) を使用する。フィールド名はキャメルケースを使用する。JSON TagとFirestore Tagの厳守:json タグは キャメルケース (examId)firestore タグは スネークケース (exam_id)タグが一つでも欠けるとQuicktype連携またはDB操作に支障をきたすため、必ず両方記述する。3.2. エラーハンドリング標準エラー: github.com/cockroachdb/errors を利用する。(backend/internal/domain/error.go)
 
 
-Wrapの利用: repository や infra 層からエラーが返される際は、必ず errors.Wrap(err, "...") を使用し、呼び出し元のコンテキスト情報を付加する。これによりスタックトレースが保持され、デバッグが容易になる。ハンドラでの処理: handler 層でエラーがキャッチされた場合、fmt.Printf("%+v\n", err) を使用してスタックトレースをログに出力する。3.3. DTOとレスポンス処理DTO（Data Transfer Object）は usecase/input および usecase/output に配置する。レスポンス用の構造体は output 内部に定義し、ToResponseData() のようなポインタレシーバメソッドを通じてドメインエンティティをレスポンス形式に変換する。4. データモデルと型定義4.1. Quicktype連携ワークフローinternal/domain および internal/usecase/output のGo構造体が、フロントエンドのTypeScript型定義のSingle Source of Truth (SSOT) となります。Go Structを更新。make generate-sample でJSONサンプルを生成。QuicktypeでJSONをTSインターフェースに変換。4.2. ドメインモデル (Go Structs)User Entity (internal/domain/user.go)サブスクリプションとアクセス制御の基盤となる情報です。// User はFirebase AuthのUIDをベースとした、アプリケーション独自のユーザー情報を保持します。
+Wrapの利用: repository や infra 層からエラーが返される際は、必ず errors.Wrap(err, "...") を使用し、呼び出し元のコンテキスト情報を付加する。これによりスタックトレースが保持され、デバッグが容易になる。ハンドラでの処理: handler 層でエラーがキャッチされた場合、fmt.Printf("%+v\n", err) を使用してスタックトレースをログに出力する。3.3. DTOとレスポンス処理DTO（Data Transfer Object）は usecase/input および usecase/output に配置する。レスポンス用の構造体は output 内部に定義し、ToResponseData() のようなポインタレシーバメソッドを通じてドメインエンティティをレスポンス形式に変換する。4. データモデルと型定義4.1. Quicktype連携ワークフローinternal/domain および internal/usecase/output のGo構造体が、フロントエンドのTypeScript型定義のSingle Source of Truth (SSOT) となります。Go Structを更新。make generate-sample でJSONサンプルを生成。QuicktypeでJSONをTSインターフェースに変換。4.2. ドメインモデル (Go Structs)Exam Entity (internal/domain/exam.go)GCP認定試験そのものを表します。// Exam は認定試験を表します（例: "Google Cloud Certified - Professional Cloud Developer"）。
+type Exam struct {
+	ID          string    `json:"id" firestore:"id"`                   // 例: "professional_cloud_developer"
+	Code        string    `json:"code" firestore:"code"`               // 例: "PCD"
+	Name        string    `json:"name" firestore:"name"`               // 例: "Professional Cloud Developer"
+	Description string    `json:"description" firestore:"description"` // 例: "あなたの能力を評価します..."
+	ImageURL    string    `json:"imageUrl" firestore:"image_url"`      // 試験のロゴ/アイコンのURL
+	CreatedAt   time.Time `json:"createdAt" firestore:"created_at"`
+}
+ExamSet Entity (internal/domain/exam_set.go)1つの資格試験に含まれる、模擬試験の単位です。// ExamSet は模擬試験のセットを表します（例: "Practice Exam 1"）。
+// Firestore Path: exams/{examID}/sets/{id}
+type ExamSet struct {
+	ID          string    `json:"id" firestore:"id"`                   // 例: "practice_exam_1"
+	ExamID      string    `json:"examId" firestore:"exam_id"`          // 親のExam ID
+	Name        string    `json:"name" firestore:"name"`               // 例: "Practice Exam 1"
+	Description string    `json:"description" firestore:"description"` // 例: "50 questions covering all domains"
+	QuestionIDs []string  `json:"questionIds" firestore:"question_ids"` // 含まれる問題IDのリスト (冗長化)
+	CreatedAt   time.Time `json:"createdAt" firestore:"created_at"`
+}
+User Entity (internal/domain/user.go)サブスクリプションとアクセス制御の基盤となる情報です。// User はFirebase AuthのUIDをベースとした、アプリケーション独自のユーザー情報を保持します。
 type User struct {
 	ID                 string             `json:"id" firestore:"id"` // Firebase Auth UID
 	Email              string             `json:"email" firestore:"email"`
@@ -123,4 +140,4 @@ type DomainScore struct {
 	TotalCount   int    `json:"totalCount" firestore:"total_count"`
 	AccuracyRate int    `json:"accuracyRate" firestore:"accuracy_rate"` // パーセンテージ (0-100)
 }
-5. Firestore設計とアクセス制御5.1. コレクション設計（コスト最適化）サブコレクションとMap構造を多用し、Read/Write回数を削減します。Collection NameDoc ID Pattern目的users{User.ID} (Firebase UID)ユーザーのロールとサブスクリプション管理。questions{ExamCode}_{SetID}_{Index}マスターデータ。試験セット単位で一括Read。users/{uid}/attemptsAuto IDトランザクションデータ。中断/完了時のみWriteし、コストを最小化。users/{uid}/stats{ExamID}集計データ。試験完了時にBackendでトランザクション更新。5.2. アクセス制御ロジック (Usecase Layer)試験開始リクエスト時（POST /users/me/attempts）に、以下のルールでアクセスを制御します。User RoleSubscription StatusTarget ExamIDAccess ResultRoleProSubActiveAll Examsアクセス許可RoleFreeN/Acloud_digital_leader (CDL)アクセス許可 (無料ユーザー特典)RoleFreeN/AOther Examsアクセス拒否RoleAdminN/AAll Examsアクセス許可RoleProSubExpired / SubCanceledAll Examsアクセス拒否 (無料ユーザーと同等に扱う)
+5. Firestore設計とアクセス制御5.1. コレクション設計（コスト最適化）サブコレクションとMap構造を多用し、Read/Write回数を削減します。Collection NameDoc ID Pattern目的exams/{examID}/sets/{setID}資格試験(Exam)、模擬試験セット(ExamSet)、問題(Question)のマスターデータ。`sets`や`questions`はサブコレクション。users/{User.ID} (Firebase UID)ユーザーのロールとサブスクリプション管理。users/{uid}/attemptsAuto IDトランザクションデータ。中断/完了時のみWriteし、コストを最小化。users/{uid}/stats{ExamID}集計データ。試験完了時にBackendでトランザクション更新。5.2. アクセス制御ロジック (Usecase Layer)試験開始リクエスト時（POST /users/me/attempts）に、以下のルールでアクセスを制御します。User RoleSubscription StatusTarget ExamIDAccess ResultRoleProSubActiveAll Examsアクセス許可RoleFreeN/Acloud_digital_leader (CDL)アクセス許可 (無料ユーザー特典)RoleFreeN/AOther Examsアクセス拒否RoleAdminN/AAll Examsアクセス許可RoleProSubExpired / SubCanceledAll Examsアクセス拒否 (無料ユーザーと同等に扱う)

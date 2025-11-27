@@ -1,8 +1,13 @@
-import { HomePage } from './features/dashboard/routes/HomePage';
+import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { LandingPage } from '@/routes/LandingPage';
 
 function App() {
   return (
-    <HomePage />
+    <BrowserRouter>
+      <Routes>
+        <Route path="/" element={<LandingPage />} />
+      </Routes>
+    </BrowserRouter>
   );
 }
 
