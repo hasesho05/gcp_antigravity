@@ -57,15 +57,17 @@ func run() error {
 	aRepo := repository_impl.NewAttemptRepository(client)
 	sRepo := repository_impl.NewUserStatsRepository(client)
 	txRepo := repository_impl.NewTransactionRepository(client)
-	examRepo := repository_impl.NewExamRepository(client) // 追加
+	examRepo := repository_impl.NewExamRepository(client)
+	userRepo := repository_impl.NewUserRepository(client)
 
 	questionUsecase := usecase.NewQuestionUsecase(qRepo)
 	attemptUsecase := usecase.NewAttemptUsecase(qRepo, aRepo, sRepo, txRepo)
 	statsUsecase := usecase.NewStatsUsecase(sRepo)
 	examUsecase := usecase.NewExamUsecase(examRepo, qRepo, aRepo, sRepo, txRepo)
+	userUsecase := usecase.NewUserUsecase(userRepo)
 
 	adminHandler := admin.NewAdminHandler(questionUsecase)
-	clientHandler := client_handler.NewClientHandler(questionUsecase, attemptUsecase, statsUsecase, examUsecase)
+	clientHandler := client_handler.NewClientHandler(questionUsecase, attemptUsecase, statsUsecase, examUsecase, userUsecase)
 
 	port := os.Getenv("PORT")
 	if port == "" {
@@ -93,13 +95,13 @@ func run() error {
 
 	// Exams (Public & Protected mixed)
 	r.Route("/exams", func(r chi.Router) {
-		// Public: List Exams
-		r.Get("/", clientHandler.ListExams)
-
 		// Protected: Exam Details & Questions
 		r.Group(func(r chi.Router) {
 			r.Use(authMiddleware)
+			r.Get("/", clientHandler.ListExams)
 			r.Route("/{examID}", func(r chi.Router) {
+				r.Get("/", clientHandler.GetExam)
+				r.Get("/sets", clientHandler.GetExamSets)
 				r.Get("/sets/{examSetID}/questions", clientHandler.GetQuestions)
 			})
 		})
@@ -110,11 +112,15 @@ func run() error {
 		r.Use(authMiddleware)
 
 		// Users
-		r.Route("/users/me", func(r chi.Router) {
-			r.Post("/attempts", clientHandler.StartAttempt)
-			r.Put("/attempts/{attemptID}", clientHandler.UpdateAttempt)
-			r.Post("/attempts/{attemptID}/complete", clientHandler.CompleteAttempt)
-			r.Get("/stats/{examID}", clientHandler.GetStats)
+		r.Route("/users", func(r chi.Router) {
+			r.Post("/", clientHandler.CreateUser)
+			r.Get("/me", clientHandler.GetCurrentUser)
+			r.Route("/me", func(r chi.Router) {
+				r.Post("/attempts", clientHandler.StartAttempt)
+				r.Put("/attempts/{attemptID}", clientHandler.UpdateAttempt)
+				r.Post("/attempts/{attemptID}/complete", clientHandler.CompleteAttempt)
+				r.Get("/stats/{examID}", clientHandler.GetStats)
+			})
 		})
 	})
 

@@ -44,6 +44,18 @@ export interface Exam {
   createdAt: string;
 }
 
+/**
+ * ExamSet は模擬試験のセットを表します（例: "Practice Exam 1"）。
+ */
+export interface ExamSet {
+  id: string; // 例: "practice_exam_1"
+  examId: string; // 親のExam ID
+  name: string; // 例: "Practice Exam 1"
+  description: string; // 例: "50 questions covering all domains"
+  questionIds: string[]; // 含まれる問題IDのリスト
+  createdAt: string;
+}
+
 //////////
 // source: question.go
 

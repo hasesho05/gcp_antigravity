@@ -9,6 +9,8 @@ import (
 
 type ExamUsecase interface {
 	ListExams(ctx context.Context) ([]domain.Exam, error)
+	GetExam(ctx context.Context, id string) (*domain.Exam, error)
+	ListExamSets(ctx context.Context, examID string) ([]domain.ExamSet, error)
 }
 
 type examUsecase struct {
@@ -32,11 +34,17 @@ func NewExamUsecase(
 		aRepo:    aRepo,
 		sRepo:    sRepo,
 		txRepo:   txRepo,
-	
-}
-
+	}
 }
 
 func (u *examUsecase) ListExams(ctx context.Context) ([]domain.Exam, error) {
 	return u.examRepo.FindAll(ctx)
+}
+
+func (u *examUsecase) GetExam(ctx context.Context, id string) (*domain.Exam, error) {
+	return u.examRepo.Find(ctx, id)
+}
+
+func (u *examUsecase) ListExamSets(ctx context.Context, examID string) ([]domain.ExamSet, error) {
+	return u.examRepo.FindSets(ctx, examID)
 }

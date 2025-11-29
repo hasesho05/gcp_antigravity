@@ -63,7 +63,10 @@ export const CertificationsSection = () => {
                 </div>
               </CardContent>
               <CardFooter className="p-6 pt-2">
-                <Button className="w-full btn-gradient text-white border-0">
+                <Button 
+                  className="w-full btn-gradient text-white border-0"
+                  onClick={() => window.location.href = `/exams/${cert.id}`}
+                >
                   問題集を解く
                 </Button>
               </CardFooter>

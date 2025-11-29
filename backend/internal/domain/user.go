@@ -7,10 +7,32 @@ import "time"
 type User struct {
 	ID                 string             `json:"id" firestore:"id"` // Firebase Auth UID
 	Email              string             `json:"email" firestore:"email"`
+	Provider           AuthProvider       `json:"provider" firestore:"provider"` // google, password, etc.
 	Role               UserRole           `json:"role" firestore:"role"` // free, pro, admin
 	SubscriptionStatus SubscriptionStatus `json:"subscriptionStatus" firestore:"subscription_status"` // active, expired, canceled
 	CreatedAt          time.Time          `json:"createdAt" firestore:"created_at"`
 }
+
+func NewUser(id, email string, provider AuthProvider) *User {
+	return &User{
+		ID:                 id,
+		Email:              email,
+		Provider:           provider,
+		Role:               RoleFree,
+		SubscriptionStatus: SubActive,
+		CreatedAt:          time.Now(),
+	}
+}
+
+// AuthProvider は認証プロバイダーを定義します。
+type AuthProvider string
+
+// tygo:enum
+const (
+	ProviderGoogle   AuthProvider = "google.com"
+	ProviderPassword AuthProvider = "password"
+	ProviderGithub   AuthProvider = "github.com"
+)
 
 // UserRole はユーザーの権限レベルを定義します。
 type UserRole string
